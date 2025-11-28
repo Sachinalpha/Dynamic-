@@ -1,0 +1,54 @@
+name: KeyVault Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      subscription_id:
+        description: 'Azure Subscription ID'
+        required: true
+      tenant_id:
+        description: 'Azure Tenant ID'
+        required: true
+      resource_group_name:
+        description: 'Resource Group Name'
+        required: true
+      keyvault_name:
+        description: 'Key Vault Name'
+        required: true
+      location:
+        description: 'Azure Location'
+        required: true
+      subnet_id:
+        description: 'Subnet ID for Key Vault'
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          auth-type: service_principal
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve \
+          -var "subscription_id=${{ github.event.inputs.subscription_id }}" \
+          -var "tenant_id=${{ github.event.inputs.tenant_id }}" \
+          -var "resource_group_name=${{ github.event.inputs.resource_group_name }}" \
+          -var "keyvault_name=${{ github.event.inputs.keyvault_name }}" \
+          -var "location=${{ github.event.inputs.location }}" \
+          -var "subnet_id=${{ github.event.inputs.subnet_id }}"
