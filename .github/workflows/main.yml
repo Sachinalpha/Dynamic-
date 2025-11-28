@@ -45,10 +45,4 @@ jobs:
         run: terraform init
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve \
-          -var "subscription_id=${{ github.event.inputs.subscription_id }}" \
-          -var "tenant_id=${{ github.event.inputs.tenant_id }}" \
-          -var "resource_group_name=${{ github.event.inputs.resource_group_name }}" \
-          -var "keyvault_name=${{ github.event.inputs.keyvault_name }}" \
-          -var "location=${{ github.event.inputs.location }}" \
-          -var "subnet_id=${{ github.event.inputs.subnet_id }}"
+        run: terraform apply -auto-approve -var "subscription_id=047ae087-7d35-4c57-8fe9-7a442cc9cf16" -var "tenant_id=93f33571-550f-43cf-b09f-cd331338d086" -var "resource_group_name=poc21-rg321" -var "keyvault_name=Keyvault-dxc321" -var "location=eastus" -var "subnet_id=/subscriptions/047ae087-7d35-4c57-8fe9-7a442cc9cf16/resourceGroups/poc21-rg321/providers/Microsoft.Network/virtualNetworks/poc21-rg321-vnet/subnets/pe-subnet"
