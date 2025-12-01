@@ -45,17 +45,19 @@ if ($secrets.Count -gt 0) {
 # Commit and Push to GitHub
 # --------------------------
 
+# Disable GitHub credential helper (critical)
+git config --global --unset credential.helper
+
 # Set Git identity
 git config --local user.email "github-actions[bot]@users.noreply.github.com"
 git config --local user.name "github-actions[bot]"
 
-# Configure remote with PAT
-$remoteUrl = "https://$PatToken@github.com/Sachinalpha/Dynamic-.git"
+# Encode PAT and update remote
+$encodedPat = [System.Web.HttpUtility]::UrlEncode($PatToken)
+$remoteUrl = "https://$encodedPat@github.com/Sachinalpha/Dynamic-.git"
 git remote set-url origin $remoteUrl
 
-# Commit changes
+# Commit and push
 git add $OutputFolder/*.json
 git commit -m "Export Key Vault secrets $RunId" || Write-Host "No changes to commit"
-
-# Push to current branch (HEAD)
 git push origin HEAD
