@@ -3,14 +3,20 @@ $KeyVaultName = $env:KEYVAULT_NAME
 $TenantId = $env:AZURE_TENANT_ID
 $ClientId = $env:AZURE_CLIENT_ID
 $ClientSecret = $env:AZURE_CLIENT_SECRET
+$PatToken = $env:PAT 
 $RunId = $env:GITHUB_RUN_ID
-if (-not $RunId) { $RunId = (Get-Date -Format "yyyyMMddHHmmss") } # fallback timestamp
+
+if (-not $RunId) {
+    $RunId = (Get-Date -Format "yyyyMMddHHmmss")
+}
 
 $RepoPath = "."
 $OutputFolder = "$RepoPath/kv-secrets"
 
 # Create output folder if not exists
-if (-not (Test-Path $OutputFolder)) { New-Item -Path $OutputFolder -ItemType Directory }
+if (-not (Test-Path $OutputFolder)) {
+    New-Item -Path $OutputFolder -ItemType Directory
+}
 
 # Authenticate to Azure using Service Principal
 $secureSecret = ConvertTo-SecureString $ClientSecret -AsPlainText -Force
@@ -35,15 +41,21 @@ if ($secrets.Count -gt 0) {
     Write-Host "No secrets found in Key Vault $KeyVaultName"
 }
 
-# Commit and push
+# --------------------------
+# Commit and Push to GitHub
+# --------------------------
+
+# Set Git identity
 git config --local user.email "github-actions[bot]@users.noreply.github.com"
 git config --local user.name "github-actions[bot]"
 
-# Use PAT for authentication
-$remoteUrl = "https://$env:GH_PAT@github.com/Sachinalpha/Dynamic-.git"
+# Configure remote with PAT
+$remoteUrl = "https://$PatToken@github.com/Sachinalpha/Dynamic-.git"
 git remote set-url origin $remoteUrl
 
+# Commit changes
 git add $OutputFolder/*.json
 git commit -m "Export Key Vault secrets $RunId" || Write-Host "No changes to commit"
-git push
 
+# Push to current branch (HEAD)
+git push origin HEAD
