@@ -11,5 +11,5 @@ output "subnet_id_used" {
 }
 
 output "vnet_id_used" {
-  value = data.azurerm_vnet.vnet   #check
+  value = data.azurerm_virtual_network.vnet   #check
 }
