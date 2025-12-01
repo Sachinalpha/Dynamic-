@@ -1,5 +1,5 @@
 output "keyvault_id" {
-  value = module.keyvault.key_vault_id
+  value = module.keyvault.keyvault_id
 }
 
 output "key_vault_uri" {
