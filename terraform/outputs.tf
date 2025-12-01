@@ -1,7 +1,11 @@
 output "keyvault_id" {
-  value = module.keyvault.keyvault_id
+  value = azurerm_key_vault.kv.id
 }
 
-output "keyvault_name" {
-  value = module.keyvault.keyvault_name
+output "key_vault_uri" {
+  value = azurerm_key_vault.kv.vault_uri
+}
+
+output "subnet_id_used" {
+  value = data.azurerm_subnet.subnet.id
 }
