@@ -28,18 +28,14 @@ Connect-AzAccount -ServicePrincipal -Tenant $TenantId -Credential $cred
 # --------------------------
 $secrets = @{}
 $secretNames = Get-AzKeyVaultSecret -VaultName $KeyVaultName | Select-Object -ExpandProperty Name
-
 foreach ($name in $secretNames) {
     $secretValue = (Get-AzKeyVaultSecret -VaultName $KeyVaultName -Name $name).SecretValueText
     $secrets[$name] = $secretValue
 }
-
 if ($secrets.Count -gt 0) {
     $secretFile = "$OutputFolder/secrets_$RunId.json"
     $secrets | ConvertTo-Json -Depth 10 | Out-File -FilePath $secretFile -Encoding UTF8
     Write-Host "Secrets saved to $secretFile"
-} else {
-    Write-Host "No secrets found in Key Vault $KeyVaultName"
 }
 
 # --------------------------
@@ -47,7 +43,6 @@ if ($secrets.Count -gt 0) {
 # --------------------------
 $keys = @{}
 $keyObjects = Get-AzKeyVaultKey -VaultName $KeyVaultName
-
 foreach ($key in $keyObjects) {
     $keys[$key.Name] = @{
         KeyType = $key.KeyType
@@ -57,45 +52,74 @@ foreach ($key in $keyObjects) {
         Tags = $key.Tags
     }
 }
-
 if ($keys.Count -gt 0) {
     $keyFile = "$OutputFolder/keys_$RunId.json"
     $keys | ConvertTo-Json -Depth 10 | Out-File -FilePath $keyFile -Encoding UTF8
     Write-Host "Keys saved to $keyFile"
-} else {
-    Write-Host "No keys found in Key Vault $KeyVaultName"
+}
+
+# --------------------------
+# Fetch Certificates
+# --------------------------
+$certificates = @{}
+$certObjects = Get-AzKeyVaultCertificate -VaultName $KeyVaultName
+foreach ($cert in $certObjects) {
+    $certificates[$cert.Name] = @{
+        Enabled = $cert.Attributes.Enabled
+        Expires = $cert.Attributes.Expires
+        Created = $cert.Attributes.Created
+        Tags = $cert.Tags
+    }
+}
+if ($certificates.Count -gt 0) {
+    $certFile = "$OutputFolder/certificates_$RunId.json"
+    $certificates | ConvertTo-Json -Depth 10 | Out-File -FilePath $certFile -Encoding UTF8
+    Write-Host "Certificates saved to $certFile"
+}
+
+# --------------------------
+# Fetch Access Policies
+# --------------------------
+$kv = Get-AzKeyVault -VaultName $KeyVaultName
+$accessPolicies = @()
+foreach ($policy in $kv.AccessPolicies) {
+    $accessPolicies += @{
+        TenantId = $policy.TenantId
+        ObjectId = $policy.ObjectId
+        Permissions = @{
+            Keys = $policy.Permissions.Keys
+            Secrets = $policy.Permissions.Secrets
+            Certificates = $policy.Permissions.Certificates
+        }
+    }
+}
+if ($accessPolicies.Count -gt 0) {
+    $apFile = "$OutputFolder/access_policies_$RunId.json"
+    $accessPolicies | ConvertTo-Json -Depth 10 | Out-File -FilePath $apFile -Encoding UTF8
+    Write-Host "Access policies saved to $apFile"
 }
 
 # --------------------------
 # Fetch Key Vault Tags
 # --------------------------
-$kv = Get-AzKeyVault -VaultName $KeyVaultName
 $tags = $kv.Tags
-
 if ($tags.Count -gt 0) {
     $tagsFile = "$OutputFolder/tags_$RunId.json"
     $tags | ConvertTo-Json -Depth 10 | Out-File -FilePath $tagsFile -Encoding UTF8
     Write-Host "Tags saved to $tagsFile"
-} else {
-    Write-Host "No tags found in Key Vault $KeyVaultName"
 }
 
 # --------------------------
 # Commit and Push to GitHub
 # --------------------------
-# Disable GitHub credential helper
 git config --global --unset credential.helper
-
-# Set Git identity
 git config --local user.email "github-actions[bot]@users.noreply.github.com"
 git config --local user.name "github-actions[bot]"
 
-# Encode PAT and update remote
 $encodedPat = [System.Web.HttpUtility]::UrlEncode($PatToken)
 $remoteUrl = "https://$encodedPat@github.com/Sachinalpha/Dynamic-.git"
 git remote set-url origin $remoteUrl
 
-# Commit and push
 git add $OutputFolder/*.json
-git commit -m "Export Key Vault data (secrets, keys, tags) $RunId" || Write-Host "No changes to commit"
+git commit -m "Export Key Vault data (secrets, keys, certificates, access policies, tags) $RunId" || Write-Host "No changes to commit"
 git push origin HEAD
