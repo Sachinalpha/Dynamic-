@@ -21,6 +21,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
+      - name: Disable GitHub credential helper
+        run: |
+          git config --global --unset-all credential.helper || true
+          git config --system --unset credential.helper || true
+          git config --global credential.helper ""
+          
       - name: Checkout repository
         uses: actions/checkout@v3
 
