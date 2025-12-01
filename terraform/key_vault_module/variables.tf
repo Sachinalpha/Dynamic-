@@ -18,7 +18,14 @@ variable "tenant_id" {
   description = "Azure AD tenant ID"
 }
 
-variable "subnet_id" {
-  type        = string
-  description = "Subnet ID to enable Key Vault on"
+variable "vnet_name" {
+  type = string
+}
+
+variable "vnet_rg" {
+  type = string
+}
+
+variable "subnet_name" {
+  type = string
 }

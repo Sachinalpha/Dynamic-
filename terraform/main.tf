@@ -10,5 +10,7 @@ module "keyvault" {
   resource_group_name  = var.resource_group_name
   location             = var.location
   tenant_id            = var.tenant_id
-  subnet_id            = var.subnet_id
+  vnet_name           = var.vnet_name
+  vnet_rg             = var.vnet_rg
+  subnet_name         = var.subnet_name
 }

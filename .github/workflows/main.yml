@@ -18,8 +18,14 @@ on:
       location:
         description: 'Azure Location'
         required: true
-      subnet_id:
-        description: 'Subnet ID for Key Vault'
+      vnet_name:
+        description: 'VNet Name'
+        required: true
+      vnet_rg:
+        description: 'VNet Resource Group'
+        required: true
+      subnet_name:
+        description: 'Subnet Name'
         required: true
 
 permissions:
@@ -49,4 +55,4 @@ jobs:
       - name: Terraform Apply
         run: |
           cd terraform
-          terraform apply -auto-approve -var "subscription_id=${{ github.event.inputs.subscription_id }}" -var "tenant_id=${{ github.event.inputs.tenant_id }}" -var "resource_group_name=${{ github.event.inputs.resource_group_name }}" -var "keyvault_name=${{ github.event.inputs.keyvault_name }}" -var "location=${{ github.event.inputs.location }}" -var "subnet_id=${{ github.event.inputs.subnet_id }}"
+          terraform apply -auto-approve -var "subscription_id=${{ github.event.inputs.subscription_id }}" -var "tenant_id=${{ github.event.inputs.tenant_id }}" -var "resource_group_name=${{ github.event.inputs.resource_group_name }}" -var "keyvault_name=${{ github.event.inputs.keyvault_name }}" -var "location=${{ github.event.inputs.location }}" -var "vnet_name=${{ github.event.inputs.vnet_name }}" -var "vnet_rg=${{ github.event.inputs.vnet_rg }}" -var "subnet_name=${{ github.event.inputs.subnet_name }}"
