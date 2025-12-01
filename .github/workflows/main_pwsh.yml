@@ -21,7 +21,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Disable GitHub credential helper
         run: |
           git config --global --unset-all credential.helper || true
@@ -30,7 +29,8 @@ jobs:
           
       - name: Checkout repository
         uses: actions/checkout@v3
-
+        with:
+          persist-credentials: false
       - name: Install Azure PowerShell
         shell: pwsh
         run: Install-Module -Name Az -Scope CurrentUser -Force -AllowClobber
