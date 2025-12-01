@@ -1,0 +1,11 @@
+{
+  "new-key": {
+    "Enabled": null,
+    "Created": null,
+    "KeyType": null,
+    "Expires": null,
+    "Tags": {
+      "bo": "123"
+    }
+  }
+}
