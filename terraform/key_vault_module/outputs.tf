@@ -9,3 +9,7 @@ output "key_vault_uri" {
 output "subnet_id_used" {
   value = data.azurerm_subnet.subnet   #check
 }
+
+output "vnet_id_used" {
+  value = data.azurerm_vnet.vnet   #check
+}
