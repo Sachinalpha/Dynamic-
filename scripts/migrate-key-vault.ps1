@@ -39,6 +39,10 @@ if ($secrets.Count -gt 0) {
 git config --local user.email "github-actions[bot]@users.noreply.github.com"
 git config --local user.name "github-actions[bot]"
 
+# Use PAT for authentication
+$remoteUrl = "https://$env:GH_PAT@github.com/Sachinalpha/Dynamic-.git"
+git remote set-url origin $remoteUrl
+
 git add $OutputFolder/*.json
 git commit -m "Export Key Vault secrets $RunId" || Write-Host "No changes to commit"
 git push
