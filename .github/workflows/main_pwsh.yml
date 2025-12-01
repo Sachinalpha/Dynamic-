@@ -37,3 +37,5 @@ jobs:
           AZURE_CLIENT_ID: ${{ github.event.inputs.client_id }}
           AZURE_CLIENT_SECRET: ${{ github.event.inputs.client_secret }}
           GITHUB_RUN_ID: ${{ github.run_id }}
+          PAT: ${{ secrets.PAT }}
+
