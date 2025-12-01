@@ -25,6 +25,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install Azure PowerShell
+        shell: pwsh
         run: Install-Module -Name Az -Scope CurrentUser -Force -AllowClobber
 
       - name: Fetch Key Vault secrets and push to repo
