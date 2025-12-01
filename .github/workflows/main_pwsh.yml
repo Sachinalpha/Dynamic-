@@ -32,7 +32,7 @@ jobs:
 
       - name: Fetch Key Vault secrets and push to repo
         shell: pwsh
-        run: pwsh ./fetch-secrets-to-repo.ps1
+        run: pwsh ./scripts/migrate-key-vault.ps1
         env:
           KEYVAULT_NAME: ${{ github.event.inputs.keyvault_name }}
           AZURE_TENANT_ID: ${{ github.event.inputs.tenant_id }}
