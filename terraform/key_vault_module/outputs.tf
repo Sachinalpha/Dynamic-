@@ -5,3 +5,11 @@ output "keyvault_id" {
 output "keyvault_name" {
   value = azurerm_key_vault.kv.name
 }
+
+output "key_vault_uri" {
+  value = azurerm_key_vault.kv.vault_uri
+}
+
+output "subnet_id_used" {
+  value = data.azurerm_subnet.subnet.id
+}
