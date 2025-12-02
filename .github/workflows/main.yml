@@ -6,17 +6,11 @@ on:
       subscription_id:
         description: 'Azure Subscription ID'
         required: true
-      tenant_id:
-        description: 'Azure Tenant ID'
-        required: true
       resource_group_name:
         description: 'Resource Group Name'
         required: true
       keyvault_name:
         description: 'Key Vault Name'
-        required: true
-      location:
-        description: 'Azure Location'
         required: true
       vnet_name:
         description: 'VNet Name'
@@ -44,6 +38,11 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
           auth-type: service_principal
 
+      - name: Extract tenant ID
+        id: get_tenant
+        run: |
+          echo "tenant_id=$(echo '${{ secrets.AZURE_CREDENTIALS }}' | jq -r '.tenantId')" >> $GITHUB_OUTPUT
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
@@ -55,4 +54,4 @@ jobs:
       - name: Terraform Apply
         run: |
           cd terraform
-          terraform apply -auto-approve -var "subscription_id=${{ github.event.inputs.subscription_id }}" -var "tenant_id=${{ github.event.inputs.tenant_id }}" -var "resource_group_name=${{ github.event.inputs.resource_group_name }}" -var "keyvault_name=${{ github.event.inputs.keyvault_name }}" -var "location=${{ github.event.inputs.location }}" -var "vnet_name=${{ github.event.inputs.vnet_name }}" -var "vnet_rg=${{ github.event.inputs.vnet_rg }}" -var "subnet_name=${{ github.event.inputs.subnet_name }}"
+          terraform apply -auto-approve -var "subscription_id=${{ github.event.inputs.subscription_id }}" -var "tenant_id=${{ steps.get_tenant.outputs.tenant_id }}" -var "resource_group_name=${{ github.event.inputs.resource_group_name }}" -var "keyvault_name=${{ github.event.inputs.keyvault_name }}" -var "vnet_name=${{ github.event.inputs.vnet_name }}" -var "vnet_rg=${{ github.event.inputs.vnet_rg }}" -var "subnet_name=${{ github.event.inputs.subnet_name }}"

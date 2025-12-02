@@ -8,11 +8,6 @@ variable "resource_group_name" {
   description = "Resource group where Key Vault will be created"
 }
 
-variable "location" {
-  type        = string
-  description = "Location of Key Vault"
-}
-
 variable "tenant_id" {
   type        = string
   description = "Azure AD tenant ID"
