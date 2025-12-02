@@ -7,20 +7,15 @@ resource "random_integer" "kv_rand" {
 }
 
 # --------------------------------------------
-# Generate Key Vault Name (first 3 segments, max 9 chars each)
+# Key Vault Name 
 # --------------------------------------------
 locals {
-  # Split RG name by hyphen
   segments = split("-", var.resource_group_name)
   n-name = slice(local.segments, 0, 4)
-
-  # Trim each segment to max 9 characters
   trimmed_segments = [for s in local.n-name : substr(s, 0, 9)]
-
-  # Join all segments without hyphens
   kv_base = join("", local.trimmed_segments)
 
-  # Final Key Vault name: lowercase + 3-digit random + "key"
+  # Final Key Vault name
   kv_final_name = lower("${local.kv_base}${random_integer.kv_rand.result}key")
 }
 
