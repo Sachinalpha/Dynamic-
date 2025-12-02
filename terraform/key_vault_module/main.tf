@@ -12,12 +12,10 @@ resource "random_integer" "kv_rand" {
 locals {
   # Split RG name by hyphen
   segments = split("-", var.resource_group_name)
-
-  # Take only the first 3 segments
-  first_three = slice(local.segments, 0, 3)
+  n-name = slice(local.segments, 0, 4)
 
   # Trim each segment to max 9 characters
-  trimmed_segments = [for s in local.first_three : substr(s, 0, 9)]
+  trimmed_segments = [for s in local.n-name : substr(s, 0, 9)]
 
   # Join all segments without hyphens
   kv_base = join("", local.trimmed_segments)
