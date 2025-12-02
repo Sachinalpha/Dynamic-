@@ -44,7 +44,7 @@ data "azurerm_subnet" "subnet" {
 # Key Vault
 # --------------------------------------------
 resource "azurerm_key_vault" "kv" {
-  name                = var.keyvault_name
+  name                = local.kv_final_name
   location            = data.azurerm_virtual_network.vnet.location
   resource_group_name = var.resource_group_name
   tenant_id           = var.tenant_id
