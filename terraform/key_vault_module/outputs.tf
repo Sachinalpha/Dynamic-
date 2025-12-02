@@ -13,3 +13,7 @@ output "subnet_id_used" {
 output "vnet_id_used" {
   value = data.azurerm_virtual_network.vnet   #check
 }
+
+output "keyvault_name_generated" {
+  value = local.kv_final_name
+}
