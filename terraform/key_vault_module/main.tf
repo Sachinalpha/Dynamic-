@@ -1,27 +1,15 @@
-# --------------------------------------------
-# Random number for uniqueness
-# --------------------------------------------
-resource "random_integer" "kv_random" {
+resource "random_integer" "kv_rand" {
   min = 100
   max = 999
 }
 
-# --------------------------------------------
-# Generate Key Vault Name based on RG
-# --------------------------------------------
 locals {
-  # Split RG name by hyphen
   segments = split("-", var.resource_group_name)
-
-  # Trim each segment to max 9 characters
   trimmed_segments = [for s in local.segments : substr(s, 0, 9)]
-
-  # Join all segments without hyphens
   kv_base = join("", local.trimmed_segments)
-
-  # Final Key Vault name
-  kv_final_name = "${kv_base}${random_integer.kv_random.result}key"
+  kv_final_name = lower"${local.kv_base}${random_integer.kv_rand.result}key"
 }
+
 
 # --------------------------------------------
 # Look up VNet
