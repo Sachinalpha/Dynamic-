@@ -4,6 +4,7 @@
 data "azurerm_virtual_network" "vnet" {
   name                = var.vnet_name
   resource_group_name = var.vnet_rg
+  location            = var.location
 }
 
 # --------------------------------------------
@@ -20,7 +21,7 @@ data "azurerm_subnet" "subnet" {
 # --------------------------------------------
 resource "azurerm_key_vault" "kv" {
   name                = var.keyvault_name
-  location            = var.location
+  location            = azurerm_virtual_network.vnet.location
   resource_group_name = var.resource_group_name
   tenant_id           = var.tenant_id
   sku_name            = "premium"
