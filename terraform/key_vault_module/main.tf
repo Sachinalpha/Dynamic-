@@ -7,24 +7,24 @@ resource "random_integer" "kv_rand" {
 }
 
 # --------------------------------------------
-# Generate Key Vault Name based on RG name
+# Generate Key Vault Name (first 3 segments, max 9 chars each)
 # --------------------------------------------
 locals {
   # Split RG name by hyphen
   segments = split("-", var.resource_group_name)
 
+  # Take only the first 3 segments
+  first_three = slice(local.segments, 0, 3)
+
   # Trim each segment to max 9 characters
-  trimmed_segments = [for s in local.segments : substr(s, 0, 9)]
+  trimmed_segments = [for s in local.first_three : substr(s, 0, 9)]
 
   # Join all segments without hyphens
   kv_base = join("", local.trimmed_segments)
-  kv_base_trimmed = substr(local.kv_base, 0, 18)
 
-  # Final Key Vault name
-  kv_final_name = lower("${local.kv_base_trimmed}${random_integer.kv_rand.result}key")
+  # Final Key Vault name: lowercase + 3-digit random + "key"
+  kv_final_name = lower("${local.kv_base}${random_integer.kv_rand.result}key")
 }
-
-
 
 # --------------------------------------------
 # Look up VNet
