@@ -1,14 +1,29 @@
+# --------------------------------------------
+# Random number for uniqueness
+# --------------------------------------------
 resource "random_integer" "kv_rand" {
   min = 100
   max = 999
 }
 
+# --------------------------------------------
+# Generate Key Vault Name based on RG name
+# --------------------------------------------
 locals {
+  # Split RG name by hyphen
   segments = split("-", var.resource_group_name)
+
+  # Trim each segment to max 9 characters
   trimmed_segments = [for s in local.segments : substr(s, 0, 9)]
+
+  # Join all segments without hyphens
   kv_base = join("", local.trimmed_segments)
-  kv_final_name = lower("${local.kv_base}${random_integer.kv_rand.result}key")
+  kv_base_trimmed = substr(local.kv_base, 0, 18)
+
+  # Final Key Vault name
+  kv_final_name = lower("${local.kv_base_trimmed}${random_integer.kv_rand.result}key")
 }
+
 
 
 # --------------------------------------------
