@@ -7,7 +7,7 @@ locals {
   segments = split("-", var.resource_group_name)
   trimmed_segments = [for s in local.segments : substr(s, 0, 9)]
   kv_base = join("", local.trimmed_segments)
-  kv_final_name = lower"${local.kv_base}${random_integer.kv_rand.result}key"
+  kv_final_name = lower("${local.kv_base}${random_integer.kv_rand.result}key")
 }
 
 
