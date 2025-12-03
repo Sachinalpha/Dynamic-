@@ -6,6 +6,9 @@ on:
       target_kv:
         description: 'Target Key Vault Name'
         required: true
+      subscription-id:
+        description: 'subscription'
+        required: true
 
 jobs:
   apply-keyvault:
@@ -15,6 +18,8 @@ jobs:
       AZURE_CLIENT_ID:   ${{ secrets.CLIENT_ID }}
       AZURE_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
       TARGET_KEYVAULT_NAME: ${{ github.event.inputs.target_kv }}
+      AZURE_SUBSCRIPTION_ID: ${{ github.event.inputs.subscription_id }}
+      KV_JSON_FOLDER: "./kv-data"
 
     steps:
       - name: Checkout repository
