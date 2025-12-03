@@ -6,14 +6,9 @@ on:
       keyvault_name:
         description: 'Key Vault Name'
         required: true
-      tenant_id:
-        description: 'Azure Tenant ID'
-        required: true
-      client_id:
-        description: 'Azure Client ID'
-        required: true
-      client_secret:
-        description: 'Azure Client Secret'
+        
+      subscription_id:
+        description: 'Azure Subscription ID'
         required: true
 
 jobs:
@@ -39,10 +34,11 @@ jobs:
         shell: pwsh
         run: pwsh ./scripts/migrate-key-vault.ps1
         env:
-          KEYVAULT_NAME: ${{ github.event.inputs.keyvault_name }}
-          AZURE_TENANT_ID: ${{ github.event.inputs.tenant_id }}
-          AZURE_CLIENT_ID: ${{ github.event.inputs.client_id }}
-          AZURE_CLIENT_SECRET: ${{ github.event.inputs.client_secret }}
-          GITHUB_RUN_ID: ${{ github.run_id }}
-          PAT: ${{ secrets.PAT }}
+          KEYVAULT_NAME:         ${{ github.event.inputs.keyvault_name }}
+          AZURE_SUBSCRIPTION_ID: ${{ github.event.inputs.subscription_id }}
+          AZURE_TENANT_ID:       ${{ secrets.TENANT_ID }}
+          AZURE_CLIENT_ID:       ${{ secrets.CLIENT_ID }}
+          AZURE_CLIENT_SECRET:   ${{ secrets.CLIENT_SECRET }}
+          GITHUB_RUN_ID:         ${{ github.run_id }}
+          PAT:                   ${{ secrets.PAT }}
 

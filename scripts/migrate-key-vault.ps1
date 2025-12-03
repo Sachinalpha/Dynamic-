@@ -1,17 +1,18 @@
 # Read from environment variables
-$KeyVaultName = $env:KEYVAULT_NAME
-$TenantId = $env:AZURE_TENANT_ID
-$ClientId = $env:AZURE_CLIENT_ID
-$ClientSecret = $env:AZURE_CLIENT_SECRET
-$PatToken = $env:PAT 
-$RunId = $env:GITHUB_RUN_ID
+$KeyVaultName      = $env:KEYVAULT_NAME
+$SubscriptionId    = $env:AZURE_SUBSCRIPTION_ID
+$TenantId          = $env:AZURE_TENANT_ID
+$ClientId          = $env:AZURE_CLIENT_ID
+$ClientSecret      = $env:AZURE_CLIENT_SECRET
+$PatToken          = $env:PAT 
+$RunId             = $env:GITHUB_RUN_ID
 
 if (-not $RunId) {
     $RunId = (Get-Date -Format "yyyyMMddHHmmss")
 }
 
-$RepoPath = "."
-$OutputFolder = "$RepoPath/kv-data"
+$RepoPath      = "."
+$OutputFolder  = "$RepoPath/kv-data"
 
 # Create output folder if not exists
 if (-not (Test-Path $OutputFolder)) {
@@ -21,7 +22,10 @@ if (-not (Test-Path $OutputFolder)) {
 # Authenticate to Azure using Service Principal
 $secureSecret = ConvertTo-SecureString $ClientSecret -AsPlainText -Force
 $cred = New-Object System.Management.Automation.PSCredential($ClientId, $secureSecret)
-Connect-AzAccount -ServicePrincipal -Tenant $TenantId -Credential $cred
+Connect-AzAccount -ServicePrincipal `
+    -Tenant $TenantId `
+    -Subscription $SubscriptionId `
+    -Credential $cred
 
 # --------------------------
 # Fetch Secrets
@@ -29,8 +33,14 @@ Connect-AzAccount -ServicePrincipal -Tenant $TenantId -Credential $cred
 $secrets = @{}
 $secretNames = Get-AzKeyVaultSecret -VaultName $KeyVaultName | Select-Object -ExpandProperty Name
 foreach ($name in $secretNames) {
-    $secretValue = (Get-AzKeyVaultSecret -VaultName $KeyVaultName -Name $name).SecretValueText
-    $secrets[$name] = $secretValue
+    $fullSecret = Get-AzKeyVaultSecret -VaultName $KeyVaultName -Name $name
+    $secrets[$name] = @{
+        Value   = $fullSecret.SecretValueText
+        Enabled = $fullSecret.Attributes.Enabled
+        Expires = $fullSecret.Attributes.Expires
+        Created = $fullSecret.Attributes.Created
+        Tags    = $fullSecret.Tags
+    }
 }
 if ($secrets.Count -gt 0) {
     $secretFile = "$OutputFolder/secrets_$RunId.json"
@@ -44,12 +54,13 @@ if ($secrets.Count -gt 0) {
 $keys = @{}
 $keyObjects = Get-AzKeyVaultKey -VaultName $KeyVaultName
 foreach ($key in $keyObjects) {
+    $fullKey = Get-AzKeyVaultKey -VaultName $KeyVaultName -Name $key.Name
     $keys[$key.Name] = @{
-        KeyType = $key.KeyType
-        Enabled = $key.Attributes.Enabled
-        Expires = $key.Attributes.Expires
-        Created = $key.Attributes.Created
-        Tags = $key.Tags
+        KeyType  = $fullKey.KeyType
+        Enabled  = $fullKey.Attributes.Enabled
+        Expires  = $fullKey.Attributes.Expires
+        Created  = $fullKey.Attributes.Created
+        Tags     = $fullKey.Tags
     }
 }
 if ($keys.Count -gt 0) {
@@ -64,11 +75,12 @@ if ($keys.Count -gt 0) {
 $certificates = @{}
 $certObjects = Get-AzKeyVaultCertificate -VaultName $KeyVaultName
 foreach ($cert in $certObjects) {
+    $fullCert = Get-AzKeyVaultCertificate -VaultName $KeyVaultName -Name $cert.Name
     $certificates[$cert.Name] = @{
-        Enabled = $cert.Attributes.Enabled
-        Expires = $cert.Attributes.Expires
-        Created = $cert.Attributes.Created
-        Tags = $cert.Tags
+        Enabled  = $fullCert.Attributes.Enabled
+        Expires  = $fullCert.Attributes.Expires
+        Created  = $fullCert.Attributes.Created
+        Tags     = $fullCert.Tags
     }
 }
 if ($certificates.Count -gt 0) {
@@ -87,9 +99,9 @@ foreach ($policy in $kv.AccessPolicies) {
         TenantId = $policy.TenantId
         ObjectId = $policy.ObjectId
         Permissions = @{
-            Keys = $policy.Permissions.Keys
-            Secrets = $policy.Permissions.Secrets
-            Certificates = $policy.Permissions.Certificates
+            Keys         = @($policy.Permissions.Keys)
+            Secrets      = @($policy.Permissions.Secrets)
+            Certificates = @($policy.Permissions.Certificates)
         }
     }
 }

@@ -1,0 +1,12 @@
+{
+  "New-test-key": {
+    "KeyType": "RSA",
+    "Enabled": true,
+    "Created": "2025-12-03T05:45:25Z",
+    "Tags": {
+      "New-test-tag": "tag",
+      "tag": "newtag43"
+    },
+    "Expires": "2027-12-03T05:43:27Z"
+  }
+}
