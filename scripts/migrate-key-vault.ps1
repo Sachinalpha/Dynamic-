@@ -1,10 +1,11 @@
 # Read from environment variables
-$KeyVaultName = $env:KEYVAULT_NAME
-$TenantId = $env:AZURE_TENANT_ID
-$ClientId = $env:AZURE_CLIENT_ID
-$ClientSecret = $env:AZURE_CLIENT_SECRET
-$PatToken = $env:PAT 
-$RunId = $env:GITHUB_RUN_ID
+$KeyVaultName      = $env:KEYVAULT_NAME
+$SubscriptionId    = $env:AZURE_SUBSCRIPTION_ID
+$TenantId          = $env:AZURE_TENANT_ID
+$ClientId          = $env:AZURE_CLIENT_ID
+$ClientSecret      = $env:AZURE_CLIENT_SECRET
+$PatToken          = $env:PAT 
+$RunId             = $env:GITHUB_RUN_ID
 
 if (-not $RunId) {
     $RunId = (Get-Date -Format "yyyyMMddHHmmss")
