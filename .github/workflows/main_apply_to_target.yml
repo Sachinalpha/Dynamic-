@@ -1,0 +1,29 @@
+name: Apply Key Vault JSON
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_kv:
+        description: 'Target Key Vault Name'
+        required: true
+
+jobs:
+  apply-keyvault:
+    runs-on: ubuntu-latest
+    env:
+      AZURE_TENANT_ID:   ${{ secrets.TENANT_ID }}
+      AZURE_CLIENT_ID:   ${{ secrets.CLIENT_ID }}
+      AZURE_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+      TARGET_KEYVAULT_NAME: ${{ github.event.inputs.target_kv }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Azure PowerShell
+        shell: pwsh
+        run: Install-Module -Name Az -Scope CurrentUser -Force -AllowClobber
+
+      - name: Apply Key Vault JSON
+        shell: pwsh
+        run: pwsh ./scripts/apply-keyvault.ps1
