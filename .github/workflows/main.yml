@@ -26,9 +26,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
-      ARM_CLIENT_ID:       ${{ secrets.CLIENT_ID }}
-      ARM_CLIENT_SECRET:   ${{ secrets.CLIENT_SECRET }}
-      ARM_TENANT_ID:       ${{ secrets.TENANT_ID }}
+      TF_VAR_client_id:       ${{ secrets.CLIENT_ID }}
+      TF_VAR_client_secret:   ${{ secrets.CLIENT_SECRET }}
+      TF_VAR_tenant_id:       ${{ secrets.TENANT_ID }}
 
     steps:
       - name: Checkout repository
