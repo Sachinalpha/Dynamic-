@@ -11,8 +11,8 @@ if (-not $RunId) {
     $RunId = (Get-Date -Format "yyyyMMddHHmmss")
 }
 
-$RepoPath = "."
-$OutputFolder = "$RepoPath/kv-data"
+$RepoPath      = "."
+$OutputFolder  = "$RepoPath/kv-data"
 
 # Create output folder if not exists
 if (-not (Test-Path $OutputFolder)) {
@@ -22,7 +22,10 @@ if (-not (Test-Path $OutputFolder)) {
 # Authenticate to Azure using Service Principal
 $secureSecret = ConvertTo-SecureString $ClientSecret -AsPlainText -Force
 $cred = New-Object System.Management.Automation.PSCredential($ClientId, $secureSecret)
-Connect-AzAccount -ServicePrincipal -Tenant $TenantId -Credential $cred
+Connect-AzAccount -ServicePrincipal `
+    -Tenant $TenantId `
+    -Subscription $SubscriptionId `
+    -Credential $cred
 
 # --------------------------
 # Fetch Secrets
@@ -45,12 +48,14 @@ if ($secrets.Count -gt 0) {
 $keys = @{}
 $keyObjects = Get-AzKeyVaultKey -VaultName $KeyVaultName
 foreach ($key in $keyObjects) {
+    # Fetch full key object to get metadata
+    $fullKey = Get-AzKeyVaultKey -VaultName $KeyVaultName -Name $key.Name
     $keys[$key.Name] = @{
-        KeyType = $key.KeyType
-        Enabled = $key.Attributes.Enabled
-        Expires = $key.Attributes.Expires
-        Created = $key.Attributes.Created
-        Tags = $key.Tags
+        KeyType  = $fullKey.KeyType
+        Enabled  = $fullKey.Attributes.Enabled
+        Expires  = $fullKey.Attributes.Expires
+        Created  = $fullKey.Attributes.Created
+        Tags     = $fullKey.Tags
     }
 }
 if ($keys.Count -gt 0) {
@@ -65,11 +70,13 @@ if ($keys.Count -gt 0) {
 $certificates = @{}
 $certObjects = Get-AzKeyVaultCertificate -VaultName $KeyVaultName
 foreach ($cert in $certObjects) {
+    # Fetch full certificate object to get metadata
+    $fullCert = Get-AzKeyVaultCertificate -VaultName $KeyVaultName -Name $cert.Name
     $certificates[$cert.Name] = @{
-        Enabled = $cert.Attributes.Enabled
-        Expires = $cert.Attributes.Expires
-        Created = $cert.Attributes.Created
-        Tags = $cert.Tags
+        Enabled  = $fullCert.Attributes.Enabled
+        Expires  = $fullCert.Attributes.Expires
+        Created  = $fullCert.Attributes.Created
+        Tags     = $fullCert.Tags
     }
 }
 if ($certificates.Count -gt 0) {
