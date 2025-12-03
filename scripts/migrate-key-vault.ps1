@@ -33,8 +33,14 @@ Connect-AzAccount -ServicePrincipal `
 $secrets = @{}
 $secretNames = Get-AzKeyVaultSecret -VaultName $KeyVaultName | Select-Object -ExpandProperty Name
 foreach ($name in $secretNames) {
-    $secretValue = (Get-AzKeyVaultSecret -VaultName $KeyVaultName -Name $name).SecretValueText
-    $secrets[$name] = $secretValue
+    $fullSecret = Get-AzKeyVaultSecret -VaultName $KeyVaultName -Name $name
+    $secrets[$name] = @{
+        Value   = $fullSecret.SecretValueText
+        Enabled = $fullSecret.Attributes.Enabled
+        Expires = $fullSecret.Attributes.Expires
+        Created = $fullSecret.Attributes.Created
+        Tags    = $fullSecret.Tags
+    }
 }
 if ($secrets.Count -gt 0) {
     $secretFile = "$OutputFolder/secrets_$RunId.json"
@@ -48,7 +54,6 @@ if ($secrets.Count -gt 0) {
 $keys = @{}
 $keyObjects = Get-AzKeyVaultKey -VaultName $KeyVaultName
 foreach ($key in $keyObjects) {
-    # Fetch full key object to get metadata
     $fullKey = Get-AzKeyVaultKey -VaultName $KeyVaultName -Name $key.Name
     $keys[$key.Name] = @{
         KeyType  = $fullKey.KeyType
@@ -70,7 +75,6 @@ if ($keys.Count -gt 0) {
 $certificates = @{}
 $certObjects = Get-AzKeyVaultCertificate -VaultName $KeyVaultName
 foreach ($cert in $certObjects) {
-    # Fetch full certificate object to get metadata
     $fullCert = Get-AzKeyVaultCertificate -VaultName $KeyVaultName -Name $cert.Name
     $certificates[$cert.Name] = @{
         Enabled  = $fullCert.Attributes.Enabled
@@ -95,9 +99,9 @@ foreach ($policy in $kv.AccessPolicies) {
         TenantId = $policy.TenantId
         ObjectId = $policy.ObjectId
         Permissions = @{
-            Keys = $policy.Permissions.Keys
-            Secrets = $policy.Permissions.Secrets
-            Certificates = $policy.Permissions.Certificates
+            Keys         = @($policy.Permissions.Keys)
+            Secrets      = @($policy.Permissions.Secrets)
+            Certificates = @($policy.Permissions.Certificates)
         }
     }
 }
