@@ -1,8 +1,3 @@
-variable "keyvault_name" {
-  type        = string
-  description = "Name of the Key Vault"
-}
-
 variable "resource_group_name" {
   type        = string
   description = "Resource group where Key Vault will be created"
