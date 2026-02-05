@@ -54,4 +54,3 @@ jobs:
           PRAXIS_API_TOKEN: ${{ secrets.PRAXIS_API_TOKEN }}
           PRAXIS_AGENT_ID: ${{ secrets.PRAXIS_AGENT_ID }}
           PRAXIS_BASE_URL: ${{ secrets.PRAXIS_BASE_URL }}
-
