@@ -1,29 +1,30 @@
-name: Simple Praxis Test
+name: Simple Praxis Test 
 
 on:
-  workflow_dispatch:   # allows manual run
+  workflow_dispatch:
 
 jobs:
   praxis:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest   # PowerShell default on Windows runners
 
     steps:
       - name: Call Praxis DevOps Specialist
-        shell: bash
+        shell: pwsh
         run: |
-          # Minimal pipeline content for testing
-          PIPELINE="jobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - run: echo 'Hello, world!'"
+          # Minimal pipeline as a single-line string
+          $pipeline = "jobs: { test: { 'runs-on': 'windows-latest', steps: [ { run: 'Write-Output Hello, world!' } ] } }"
 
-          RESPONSE=$(curl -s -X POST "$PRAXIS_BASE_URL/agents/execute" \
-            -H "Authorization: Bearer $PRAXIS_API_TOKEN" \
-            -H "Content-Type: application/json" \
-            -d "{
-              \"agent\": \"$PRAXIS_AGENT_ID\",
-              \"input\": \"Analyze this GitHub Actions pipeline and explain what it does:\\n\\n$PIPELINE\"
-            }")
+          # Call Praxis
+          $response = Invoke-RestMethod -Uri $env:PRAXIS_BASE_URL/agents/execute `
+            -Method Post `
+            -Headers @{ Authorization = "Bearer $env:PRAXIS_API_TOKEN"; "Content-Type" = "application/json" } `
+            -Body (@{
+                agent = $env:PRAXIS_AGENT_ID
+                input = "Analyze this GitHub Actions pipeline and explain what it does: $pipeline"
+            } | ConvertTo-Json -Compress)
 
-          echo "=== Praxis Response ==="
-          echo "$RESPONSE"
+          Write-Host "=== Praxis Response ==="
+          Write-Host $response
         env:
           PRAXIS_API_TOKEN: ${{ secrets.PRAXIS_API_TOKEN }}
           PRAXIS_AGENT_ID: ${{ secrets.PRAXIS_AGENT_ID }}
