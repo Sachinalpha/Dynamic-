@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:   # <--- enables manual run
+  workflow_dispatch:
 
 jobs:
   hello:
@@ -18,8 +18,17 @@ jobs:
         run: echo "Hello, world!"
 
       - name: Ask Praxis DevOps Specialist about pipeline
+        shell: bash
         run: |
-          PIPELINE=$(cat .github/workflows/praxis.yml)
+          # Use full path to workflow file
+          WORKFLOW_FILE="$GITHUB_WORKSPACE/.github/workflows/praxis.yml"
+
+          if [[ ! -f "$WORKFLOW_FILE" ]]; then
+            echo "ERROR: workflow file not found at $WORKFLOW_FILE"
+            exit 1
+          fi
+
+          PIPELINE=$(cat "$WORKFLOW_FILE" | sed 's/"/\\"/g')  # escape quotes for JSON
 
           RESPONSE=$(curl -s -X POST "$PRAXIS_BASE_URL/agents/execute" \
             -H "Authorization: Bearer $PRAXIS_API_TOKEN" \
