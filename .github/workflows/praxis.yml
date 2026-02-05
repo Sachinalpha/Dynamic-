@@ -1,7 +1,7 @@
-name: Simple Praxis Test 
+name: Praxis Agent Test 
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: 
 
 jobs:
   praxis:
@@ -11,16 +11,20 @@ jobs:
       - name: Call Praxis DevOps Specialist
         shell: pwsh
         run: |
-          # Minimal pipeline as a single-line string
+          # Minimal pipeline string for testing
           $pipeline = "jobs: { test: { 'runs-on': 'windows-latest', steps: [ { run: 'Write-Output Hello, world!' } ] } }"
 
-          # Ensure the full URI
-          $uri = "$($env:PRAXIS_BASE_URL)/agents/execute"
+          # Build full API URL safely
+          $baseUrl = $env:PRAXIS_BASE_URL.Trim()
+          $uri = "$baseUrl/agents/execute"
 
-          # Call Praxis
+          # Call the Praxis agent
           $response = Invoke-RestMethod -Uri $uri `
             -Method Post `
-            -Headers @{ Authorization = "Bearer $env:PRAXIS_API_TOKEN"; "Content-Type" = "application/json" } `
+            -Headers @{ 
+                Authorization = "Bearer $env:PRAXIS_API_TOKEN"
+                "Content-Type" = "application/json"
+            } `
             -Body (@{
                 agent = $env:PRAXIS_AGENT_ID
                 input = "Analyze this GitHub Actions pipeline and explain what it does: $pipeline"
