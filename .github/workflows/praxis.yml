@@ -20,13 +20,19 @@ jobs:
 
       - name: Run Praxis Agent
         env:
-          AGENT_ID: ${{ secrets.PRAXIS_AGENT_ID }}
-          API_KEY: ${{ secrets.PRAXIS_API_TOKEN }}
+          PRAXIS_AGENT_ID: ${{ secrets.PRAXIS_AGENT_ID }}
+          PRAXIS_API_TOKEN: ${{ secrets.PRAXIS_API_TOKEN }}
         run: |
-          node -e "
+          node <<'JS'
           const fetch = require('node-fetch');
-          const agentId = process.env.AGENT_ID;
-          const apiKey = process.env.API_KEY;
+
+          const agentId = process.env.PRAXIS_AGENT_ID;
+          const apiKey = process.env.PRAXIS_API_TOKEN;
+
+          if (!agentId || !apiKey) {
+            console.error("ERROR: Agent ID or API token is missing!");
+            process.exit(1);
+          }
 
           fetch(`https://api.praxis.ai/v1/agent/${agentId}/run`, {
             method: 'POST',
@@ -39,4 +45,5 @@ jobs:
           .then(res => res.json())
           .then(data => console.log('Agent Response:', data))
           .catch(err => console.error('Error:', err));
-          "
+          JS
+
