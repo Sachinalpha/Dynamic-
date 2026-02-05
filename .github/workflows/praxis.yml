@@ -1,4 +1,4 @@
-name: Manual Praxis Test
+name: Manual Praxis Test (Python)
 
 on:
   workflow_dispatch:
@@ -8,10 +8,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Call Praxis Agent
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install requests
+        run: pip install requests
+
+      - name: Run Praxis Agent
         env:
           AGENT_ID: ${{ secrets.PRAXIS_AGENT_ID }}
           API_KEY: ${{ secrets.PRAXIS_API_TOKEN }}
         run: |
-          RESPONSE=$(curl -s --insecure -X POST "https://api.praxis.ai/v1/agent/$AGENT_ID/run" -H "Authorization: Bearer $API_KEY" -H "Content-Type: application/json" -d '{"input":"Hello World"}')
-          echo "Agent Response: $RESPONSE"
+          python - <<EOF
+          import os
+          import requests
+
+          agent_id = os.environ["AGENT_ID"]
+          api_key = os.environ["API_KEY"]
+
+          url = f"https://api.praxis.ai/v1/agent/{agent_id}/run"
+          payload = {"input": "Hello World"}
+          headers = {
+              "Authorization": f"Bearer {api_key}",
+              "Content-Type": "application/json"
+          }
+
+          response = requests.post(url, json=payload, headers=headers)
+          print("Agent Response:", response.json())
+          EOF
