@@ -13,10 +13,5 @@ jobs:
           AGENT_ID: ${{ secrets.PRAXIS_AGENT_ID }}
           API_KEY: ${{ secrets.PRAXIS_API_TOKEN }}
         run: |
-          RESPONSE=$(curl -s -X POST "https://api.praxis.ai/v1/agent/$AGENT_ID/run" \
-            -H "Authorization: Bearer $API_KEY" \
-            -H "Content-Type: application/json" \
-            -d '{"input":"Hello World"}' \
-            --fail \
-            --show-error)
+          RESPONSE=$(curl -s --insecure -X POST "https://api.praxis.ai/v1/agent/$AGENT_ID/run" -H "Authorization: Bearer $API_KEY" -H "Content-Type: application/json" -d '{"input":"Hello World"}')
           echo "Agent Response: $RESPONSE"
