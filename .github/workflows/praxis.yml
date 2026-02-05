@@ -1,0 +1,37 @@
+name: Hello World Test
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:   # <--- enables manual run
+
+jobs:
+  hello:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Say Hello
+        run: echo "Hello, world!"
+
+      - name: Ask Praxis DevOps Specialist about pipeline
+        run: |
+          PIPELINE=$(cat .github/workflows/hello-world.yml)
+
+          RESPONSE=$(curl -s -X POST "$PRAXIS_BASE_URL/agents/execute" \
+            -H "Authorization: Bearer $PRAXIS_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"agent\": \"$PRAXIS_AGENT_ID\",
+              \"input\": \"Analyze this GitHub Actions pipeline and explain what it does:\\n\\n$PIPELINE\"
+            }")
+
+          echo "=== Praxis Response ==="
+          echo "$RESPONSE"
+        env:
+          PRAXIS_API_TOKEN: ${{ secrets.PRAXIS_API_TOKEN }}
+          PRAXIS_AGENT_ID: ${{ secrets.PRAXIS_AGENT_ID }}
+          PRAXIS_BASE_URL: ${{ secrets.PRAXIS_BASE_URL }}
