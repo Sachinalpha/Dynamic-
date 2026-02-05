@@ -19,7 +19,7 @@ jobs:
 
       - name: Ask Praxis DevOps Specialist about pipeline
         run: |
-          PIPELINE=$(cat .github/workflows/hello-world.yml)
+          PIPELINE=$(cat .github/workflows/praxis.yml)
 
           RESPONSE=$(curl -s -X POST "$PRAXIS_BASE_URL/agents/execute" \
             -H "Authorization: Bearer $PRAXIS_API_TOKEN" \
