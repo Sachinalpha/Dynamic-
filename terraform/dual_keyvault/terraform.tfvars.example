@@ -1,0 +1,30 @@
+# Azure Authentication
+subscription_id = "your-subscription-id"
+tenant_id       = "your-tenant-id"
+client_id       = "your-service-principal-client-id"
+client_secret   = "your-service-principal-client-secret"
+
+# Resource Configuration
+resource_group_name  = "rg-keyvault-migration"
+location             = "eastus"
+
+# Key Vault Names (must be globally unique, 3-24 chars)
+source_keyvault_name = "kv-source-001"
+target_keyvault_name = "kv-target-001"
+
+# Key Vault Settings
+sku_name                   = "standard"
+soft_delete_retention_days = 7
+purge_protection_enabled   = false
+enable_rbac_authorization  = false
+
+# Network Settings (optional)
+network_acls_default_action = "Allow"
+allowed_subnet_ids          = []
+allowed_ip_ranges           = []
+
+# Tags
+tags = {
+  Environment = "Development"
+  Project     = "KeyVault-Migration"
+}
