@@ -1,0 +1,10 @@
+name: Hello World Workflow
+
+on: [push]
+
+jobs:
+  hello:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Hello World Step
+      run: echo "Hello World from your GitHub Actions pipeline!"
